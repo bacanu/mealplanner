@@ -5,7 +5,7 @@
 <div class="container" id="app">
     <div class="col-sm-12 visible-sm visible-xs">
         <br>
-        <a href="{{ url('planner') }}" class="btn btn-default">Back To Planner</a>
+        <a href="{{ url('/') }}" class="btn btn-default">Back To Planner</a>
         <br>
         <br>
     </div>

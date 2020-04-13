@@ -10,11 +10,6 @@ use Illuminate\Http\Request;
 
 class DaysController extends Controller
 {
-    public function main()
-    {
-        return view('mealplanner');
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -22,6 +17,21 @@ class DaysController extends Controller
      */
     public function index()
     {
+        $days = $this->getDaysToDisplay();
+        $lastFilledDays = $this->getLatestPlannedWeek();
+        $slots = $this->getSlots();
+        $ingredients = $this->getIngredientsForNextWeek();
+
+        $prepStartReadable = Carbon::now()->addDays(7)->startOfWeek()->format('d-m-Y');
+        $prepEndReadable = Carbon::now()->addDays(7)->endOfWeek()->format('d-m-Y');
+
+        return compact('days', 'slots', 'ingredients', 'prepStartReadable', 'prepEndReadable', 'lastFilledDays');
+    }
+
+    /**
+     * 2 weeks: the current one and the next one
+     */
+    private function getDaysToDisplay() {
         $start = Carbon::now()->startOfWeek();
         $end = Carbon::now()->addWeek()->endOfWeek();
         $days = Day::getOrMakeInterval($start, $end);
@@ -31,10 +41,20 @@ class DaysController extends Controller
             $day->isToday = $day->date == Carbon::now()->startOfDay();
         }
 
-        $lastFilledDays = $this->getLastFilledWeek();
+        return $days;
+    }
 
+    /**
+     * Breakfast / Lunch / Dinner
+     * Stored in the database so they can be changed easily
+     */
+    private function getSlots() {
         $slots = DaySlot::orderBy('order', 'asc')->get();
 
+        return $slots;
+    }
+
+    private function getIngredientsForNextWeek() {
         $ingredients = [];
 
         $prepStart = Carbon::now()->addDays(7)->startOfWeek();
@@ -53,13 +73,14 @@ class DaysController extends Controller
             }
         }
 
-        $prepStart = $prepStart->format('d-m-Y');
-        $prepEnd = $prepEnd->format('d-m-Y');
-
-        return compact('days', 'slots', 'ingredients', 'prepStart', 'prepEnd', 'lastFilledDays');
+        return $ingredients;
     }
 
-    private function getLastFilledWeek()
+    /**
+     * Used to populate empty weeks with the latest / most recent planned week
+     * Useful if the planner hasn't been used for some time
+     */
+    private function getLatestPlannedWeek()
     {
         //this assumes that the last day will be on a sunday
         $lastDay = Day::join('day_meal', 'day_meal.day_id', '=', 'days.id')
@@ -83,49 +104,6 @@ class DaysController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
@@ -137,26 +115,15 @@ class DaysController extends Controller
         /** @var Day $day */
         $day = Day::findOrFail($id);
 
-        foreach ($request->meals as $m) {
-            $slot = DaySlot::findOrFail($m['day_slot_id']);
+        foreach ($request->meals as $meal) {
+            $slot = DaySlot::findOrFail($meal['day_slot_id']);
 
-            if (!isset($m['id']) || !$m['id']) {
+            if (!isset($meal['id']) || !$meal['id']) {
                 $day->clearSlot($slot);
             } else {
-                $meal = Meal::findOrFail($m['id']);
-                $day->assignMealToSlot($meal, $slot);
+                $m = Meal::findOrFail($meal['id']);
+                $day->assignMealToSlot($m, $slot);
             }
         }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

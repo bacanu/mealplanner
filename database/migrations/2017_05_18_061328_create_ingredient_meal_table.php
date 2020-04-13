@@ -18,7 +18,7 @@ class CreateIngredientMealTable extends Migration
             $table->timestamps();
             $table->integer('ingredient_id');
             $table->integer('meal_id');
-            $table->decimal('quantity', 2);
+            $table->decimal('quantity', 8, 2);
         });
     }
 

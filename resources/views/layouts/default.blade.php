@@ -27,36 +27,8 @@
             display: none;
         }
 
-        .header {
-            font-size: 20px;
-            margin-bottom: 10px;
-            border-bottom: 2px solid #ddd;
-        }
-
-        .day-item {
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-
-        .day-item:hover {
-            background: #eee;
-        }
-
-        .day-item.is-today {
-            background: #e4b9c0;
-        }
-
-        .date-item {
-            font-size: 20px;
-        }
-
-        .meal-item {
-            font-size: 14px;
-            overflow: auto;
-        }
-
-        .meal-item button {
-            float: right;
+        .is-today {
+            background: #e4b9c0 !important;
         }
     </style>
 </head>

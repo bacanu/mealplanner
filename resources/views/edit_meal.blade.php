@@ -5,7 +5,7 @@
 <div class="container" id="app">
     <div class="col-sm-12 visible-sm visible-xs">
         <br>
-        <a href="{{ url('planner') }}" class="btn btn-default">Back To Planner</a>
+        <a href="{{ url('/') }}" class="btn btn-default">Back To Planner</a>
         <br>
         <br>
     </div>
@@ -30,13 +30,13 @@
             <tr>
                 <th>Name</th>
                 <th>Quantity</th>
-                <th></th>
+                <th style="width: 52px"></th>
             </tr>
             </thead>
             <tbody>
             @foreach($meal->ingredients as $ingredient)
                 <tr>
-                    <td>{{ $ingredient->name}}</td>
+                    <td><a href="{{ $ingredient->action_urls["edit"] }}">{{ $ingredient->name}}</a></td>
                     <td>{{ $ingredient->quantity }}</td>
                     <td>
                         <form method="POST" action="{{ route('meals.ingredients.destroy', [$meal->id, $ingredient->id]) }}">

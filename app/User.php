@@ -25,9 +25,4 @@ class User extends Authenticatable
         'email',
     ];
 
-    public function updateApiToken()
-    {
-        $this->api_token = hash('sha256', \Str::random(60));
-        $this->save();
-    }
 }

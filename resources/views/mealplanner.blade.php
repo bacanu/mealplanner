@@ -2,69 +2,51 @@
 
 @section('content')
     
-<div class="container" id="app" v-cloak>
-    <div class="col-sm-3 col-md-push-9 hidden-xs">
-        <h4 style="padding: 10px 0;">Meals</h4>
-        <form @submit.prevent="saveNewMeal">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input v-model="newMeal.name" type="text" class="form-control" id="name"
-                       placeholder="Omlette">
-            </div>
-            <button type="button" @click="saveNewMeal" class="btn btn-primary">Submit</button>
-        </form>
-        <hr>
-        <table class="table table-striped table-bordered">
-            <thead>
-            <tr>
-                <th></th>
-                <th>Name</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="meal in meals">
-                <td :class="{'bg-danger': meal.has_ingredients_without_price}">
-                    <button @click="assignMealToNextEmptyDaySlot(meal)"> <<</button>
-                </td>
-                <td :class="{'bg-danger': meal.has_ingredients_without_price}">
-                    <a :href="meal.action_urls.edit" >@{{ meal.name }}</a>&nbsp;
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+<div class="container-fluid" id="app" v-cloak>
 
-    <div class="col-sm-9 col-md-pull-3">
-        <div class="visible-xs">
-            <h4 style="padding: 10px 0;">Today</h4>
-            <div class="row day-item">
-                <div class="col-sm-3 date-item">@{{ today.date_readable }}</div>
-                <div class="col-sm-3 meal-item" v-for="meal in today.meals">@{{ meal.name }}</div>
-            </div>
-        </div>
-        <div class="visible-xs">
-            <button class="btn btn-default" @click="showDaysOnMobile = !showDaysOnMobile">Show Days</button>
+    <div class="col-sm-9 col-md-7">
+        <div class="visible-xs" v-if="!showDaysOnMobile">
+            <h4 style="padding: 10px 0;">
+                Today
+                <button class="btn btn-primary" @click="showDaysOnMobile = !showDaysOnMobile">Show All Days</button>
+            </h4>
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr><td>@{{ today.date_readable }}</td></tr>
+                </thead>
+                <tbody>
+                    <tr v-for="meal in today.meals"><td>@{{ meal.name }}</td></tr>
+                </tbody>
+            </table>
         </div>
         <div :class="{'hidden-xs': !showDaysOnMobile}">
             <h4 style="padding: 10px 0;">Days
                 <button v-show="planHasChanges" @click="saveDays" class="btn btn-primary">Save</button>
-                <button @click="copyFromLastjFilledWeek" class="btn btn-primary">Copy from last</button>
+                <button @click="copyFromLastFilledWeek" class="btn btn-primary">Copy from last</button>
             </h4>
-            <div class="row hidden-xs header">
-                <div class="col-sm-3">Date</div>
-                <div class="col-sm-3" v-for="slot in slots">@{{ slot.name }}</div>
-            </div>
-
-            <div class="row day-item" v-for="day in days" :class="{'is-today': day.isToday}">
-                <div class="col-sm-3 date-item">@{{ day.date_readable }}</div>
-                <div class="col-sm-3 meal-item" v-for="meal in day.meals">@{{ meal.name }} &nbsp;
-                    <button v-show="meal.name.length" @click="removeMealFromDay(meal, day)">&times;</button>
-                </div>
-            </div>
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr class="hidden-xs">
+                        <td>Date</td>
+                        <td v-for="slot in slots">@{{ slot.name }}</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="day in days" :class="{'is-today': day.isToday}">
+                        <th>@{{ day.date_readable }}</th>
+                        <td v-for="meal in day.meals">
+                            @{{ meal.name }}
+                            <button class="pull-right hidden-xs" v-show="meal.name.length" @click="removeMealFromDay(meal, day)">&times;</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <table class="table table-striped table-bordered">
-            <h4>Ingredients</h4>
+            <h4>Ingredients for next week
+                <a href="{{ route('prices.index') }}" class="btn btn-primary">Edit prices</a>
+            </h4>
             <thead>
             <tr>
                 <th>Name</th>
@@ -89,7 +71,33 @@
         </table>
 
 
-        <a href="{{ route('prices.index') }}" class="btn btn-default">Add prices</a>
+        
+    </div>
+
+    <div class="col-sm-3 col-md-5 hidden-xs">
+        <h4 style="padding: 10px 0;">Meals <button type="button" @click="promptForNewMeal" class="btn btn-primary">Add</button></h4>
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th style="width: 50px"></th>
+                <th>Name</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="meal in meals">
+                <td>
+                    <button @click="assignMealToNextEmptyDaySlot(meal)"> <<</button>
+                </td>
+                <td>
+                    <a :href="meal.action_urls.edit" >@{{ meal.name }}</a>&nbsp;
+
+                    <a href="{{ route("prices.index") }}" class="pull-right" title="One or more ingredients from this meal do not have prices" v-if="meal.has_ingredients_without_price">
+                        &nbsp;!&nbsp;
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 <script>
@@ -101,7 +109,6 @@
 const app = new Vue({ 
     el: '#app',
     data: {
-        newMeal: makeEmptyMeal(),
         meals: [],
         days: [],
         lastFilledDays: [],
@@ -114,7 +121,7 @@ const app = new Vue({
         showDaysOnMobile: false,
     },
     computed: {
-        estimatedTotalPrice: function () {
+        estimatedTotalPrice() {
             var total = 0;
 
             Object.values(this.ingredients).forEach(function(ingredient) {
@@ -125,97 +132,91 @@ const app = new Vue({
         }
     },
     methods: {
-        loadAll: function () {
+        loadAll() {
             this.loadDays();
             this.loadMeals();
         },
 
-        loadDays: function () {
-            var that = this;
+        loadDays() {
             axios.post(DAYS_INDEX, {
                 _method: "GET",
-            }).then(function (response) {
-                that.days = response.data.days.map(function (data) {
+            }).then((response) => {
+                this.days = response.data.days.map(function (data) {
                     return new Day(data);
                 });
 
-                that.lastFilledDays = response.data.lastFilledDays.map(function (data) {
+                this.lastFilledDays = response.data.lastFilledDays.map(function (data) {
                     return new Day(data);
                 });
 
-                that.today = that.days.filter(function (day) {
+                this.today = this.days.filter(function (day) {
                     return day.isToday;
                 })[0];
-                that.slots = response.data.slots;
-                that.ingredients = response.data.ingredients;
-                that.prepStart = response.data.prepStart;
-                that.prepEnd = response.data.prepEnd;
+                this.slots = response.data.slots;
+                this.ingredients = response.data.ingredients;
+                this.prepStart = response.data.prepStart;
+                this.prepEnd = response.data.prepEnd;
 
-            }, function (error) {
+            }, (error) => {
                 console.error(error);
             });
         },
-        saveDays: function () {
+        saveDays() {
             var that = this;
 
-            Promise.all(that.days.map(function (day) {
-                return that.saveDay(day);
-            })).then(function () {
-                that.planHasChanges = false;
+            Promise.all(that.days.map((day) => {
+                return this.saveDay(day);
+            })).then(() => {
+                this.planHasChanges = false;
             })
         },
-        saveDay: function (day) {
+        saveDay(day) {
             axios.post(day.action_urls.update, {
                 _method: "PUT",
                 meals: day.meals
-            }).then(function (response) {
+            }).then((response) => {
 
-            }, function (error) {
+            }, (error) => {
                 console.error(error);
             });
         },
-        loadMeals: function () {
-            var that = this;
+        loadMeals() {
             axios.post(MEALS_INDEX, {
                 _method: "GET"
-            }).then(function (response) {
-                that.meals = response.data;
+            }).then((response) => {
+                this.meals = response.data;
 
-            }, function (error) {
+            }, (error) => {
                 console.error(error);
             });
         },
-        copyFromLastjFilledWeek: function () {
-            var that = this;
-            console.log(this.lastFilledDays);
-            this.days.forEach(function(day, index) {
+        copyFromLastFilledWeek() {
+            this.days.forEach((day, index) => {
                 if (isEmptyDay(day)) {
-                    var jFilledDay = that.lastFilledDays[index % 7];
-                    day.meals = jFilledDay.meals;
+                    var FilledDay = that.lastFilledDays[index % 7];
+                    day.meals = FilledDay.meals;
 
                     that.planHasChanges = true;
                 }
             });
 
+            this.saveDays();
+
             function isEmptyDay(day) {
                 return day.meals[0].name === '' && day.meals[1].name === '' && day.meals[2].name === '';
             }
         },
-        saveNewMeal: function () {
-            var that = this;
+        promptForNewMeal() {
+            var value = window.prompt("Meal name?");
             axios.post(MEALS_STORE, {
-                name: that.newMeal.name
-            }).then(function (response) {
-                //reset newTransaction
-                that.newMeal = makeEmptyMeal();
-
-                that.loadAll();
-
-            }, function (error) {
+                name: value
+            }).then(() => {
+                this.loadAll();
+            }, (error) => {
                 console.error(error);
             });
         },
-        removeMealFromDay: function (meal, day) {
+        removeMealFromDay(meal, day) {
             var toReplace = day.meals.filter(function (item) {
                 return item.name === meal.name && item.day_slot_id === meal.day_slot_id;
             });
@@ -227,7 +228,7 @@ const app = new Vue({
 
             this.planHasChanges = true;
         },
-        assignMealToNextEmptyDaySlot: function (meal) {
+        assignMealToNextEmptyDaySlot(meal) {
             var found = false;
 
             this.days.forEach(function (day) {
@@ -245,17 +246,10 @@ const app = new Vue({
             this.planHasChanges = true;
         }
     },
-    created: function () {
-        console.log("created");
+    created() {
         this.loadAll();
     }
 });
-
-function makeEmptyMeal() {
-    return {
-        name: ''
-    }
-}
 
 function Day(data) {
     load(this, data);
