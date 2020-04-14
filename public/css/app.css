@@ -10882,3 +10882,11 @@ a.text-dark:focus {
   }
 }
 
+[v-cloak] {
+  display: none;
+}
+
+.is-today {
+  background: #e4b9c0 !important;
+}
+

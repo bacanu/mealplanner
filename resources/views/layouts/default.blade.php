@@ -15,31 +15,19 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/app.js') }}" defer></script>
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <style>
-        [v-cloak] {
-            display: none;
-        }
-
-        .is-today {
-            background: #e4b9c0 !important;
-        }
-    </style>
 </head>
 <body>
 
 @yield('content')
 
-<div class="container">
+<div class="container-fluid">
     <hr>
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col">
             <a href="{{ route('logout') }}" 
                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
              {{ __('Logout') }}
@@ -47,10 +35,13 @@
 
         </div>
     </div>
+    <br>
+    <br>
 </div>
 
 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
  @csrf
 </form>
+
 </body>
 </html>
