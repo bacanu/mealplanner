@@ -38,6 +38,11 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
+        //limit the number of accounts to 1 to prevent other people from registering
+        if(User::count() > 0) {
+            abort(404);
+        }
+
         $this->middleware('guest');
     }
 
