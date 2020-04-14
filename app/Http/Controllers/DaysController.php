@@ -65,7 +65,7 @@ class DaysController extends Controller
             foreach ($day->getMeals() as $meal) {
                 foreach ($meal->ingredients as $ingredient) {
                     if (isset($ingredients[$ingredient->name])) {
-                        $ingredients[$ingredient->name]->quantity += round($ingredient->quantity, 2);
+                        $ingredients[$ingredient->name]->quantity = round(($ingredients[$ingredient->name]->quantity + $ingredient->quantity), 2);
                     } else {
                         $ingredients[$ingredient->name] = $ingredient;
                     }
