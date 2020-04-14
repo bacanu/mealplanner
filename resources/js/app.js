@@ -71,9 +71,7 @@ const app = new Vue({
             });
         },
         saveDays() {
-            var that = this;
-
-            Promise.all(that.days.map((day) => {
+            Promise.all(this.days.map((day) => {
                 return this.saveDay(day);
             })).then(() => {
                 this.planHasChanges = false;
@@ -84,7 +82,6 @@ const app = new Vue({
                 _method: "PUT",
                 meals: day.meals
             }).then((response) => {
-
             }, (error) => {
                 console.error(error);
             });
@@ -102,10 +99,10 @@ const app = new Vue({
         copyFromLastFilledWeek() {
             this.days.forEach((day, index) => {
                 if (isEmptyDay(day)) {
-                    var FilledDay = that.lastFilledDays[index % 7];
+                    var FilledDay = this.lastFilledDays[index % 7];
                     day.meals = FilledDay.meals;
 
-                    that.planHasChanges = true;
+                    this.planHasChanges = true;
                 }
             });
 

@@ -42493,8 +42493,7 @@ var app = new Vue({
     saveDays: function saveDays() {
       var _this2 = this;
 
-      var that = this;
-      Promise.all(that.days.map(function (day) {
+      Promise.all(this.days.map(function (day) {
         return _this2.saveDay(day);
       })).then(function () {
         _this2.planHasChanges = false;
@@ -42520,11 +42519,13 @@ var app = new Vue({
       });
     },
     copyFromLastFilledWeek: function copyFromLastFilledWeek() {
+      var _this4 = this;
+
       this.days.forEach(function (day, index) {
         if (isEmptyDay(day)) {
-          var FilledDay = that.lastFilledDays[index % 7];
+          var FilledDay = _this4.lastFilledDays[index % 7];
           day.meals = FilledDay.meals;
-          that.planHasChanges = true;
+          _this4.planHasChanges = true;
         }
       });
       this.saveDays();
@@ -42534,13 +42535,13 @@ var app = new Vue({
       }
     },
     promptForNewMeal: function promptForNewMeal() {
-      var _this4 = this;
+      var _this5 = this;
 
       var value = window.prompt("Meal name?");
       axios.post(MEALS_STORE, {
         name: value
       }).then(function () {
-        _this4.loadAll();
+        _this5.loadAll();
       }, function (error) {
         console.error(error);
       });
@@ -42589,21 +42590,6 @@ function Day(data) {
     parent.isToday = data.isToday;
   }
 }
-
-function registerServiceWorker() {
-  // register sw script in supporting browsers
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('swplanner.js', {
-      scope: '/'
-    }).then(function () {
-      console.log('Service Worker registered successfully.');
-    })["catch"](function (error) {
-      console.log('Service Worker registration failed:', error);
-    });
-  }
-}
-
-registerServiceWorker();
 
 /***/ }),
 

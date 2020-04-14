@@ -37,7 +37,7 @@
                             <th>@{{ day.date_readable }}</th>
                             <td v-for="meal in day.meals">
                                 @{{ meal.name }}
-                                <button class="float-right d-none d-sm-inline" v-show="meal.name.length" @click="removeMealFromDay(meal, day)">&times;</button>
+                                <button class="float-right d-none d-sm-inline" v-if="(meal.name.length > 0)" @click="removeMealFromDay(meal, day)">&times;</button>
                             </td>
                         </tr>
                     </tbody>
