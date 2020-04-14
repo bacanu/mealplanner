@@ -36,10 +36,10 @@ const app = new Vue({
             var total = 0;
 
             Object.values(this.ingredients).forEach(function(ingredient) {
-                total += ingredient.price_per_unit * ingredient.quantity
+                total += _.round(ingredient.price_per_unit * ingredient.quantity, 2)
             });
 
-            return total.toFixed(2);
+            return _.round(total, 2);
         }
     },
     methods: {
