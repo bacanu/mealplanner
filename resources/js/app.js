@@ -172,15 +172,3 @@ function Day(data) {
         parent.isToday = data.isToday;
     }
 }
-
-function registerServiceWorker() {
-    // register sw script in supporting browsers
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('swplanner.js', {scope: '/'}).then(function () {
-            console.log('Service Worker registered successfully.');
-        }).catch(function (error) {
-            console.log('Service Worker registration failed:', error);
-        });
-    }
-}
-registerServiceWorker();
