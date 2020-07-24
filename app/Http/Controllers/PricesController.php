@@ -19,13 +19,7 @@ class PricesController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function update(Request $request)
     {
         foreach ($request->ingredients as $id => $price) {
             $ingredient = Ingredient::findOrFail($id);

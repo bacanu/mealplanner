@@ -4,8 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['web', 'auth']], function (){
     Route::get('/', 'PlannerController@index');
-    Route::resource('prices', 'PricesController')
-        ->only(['index', 'store']);
+    Route::get('prices', 'PricesController@index')->name('prices.index');
+    Route::put('prices', 'PricesController@update')->name('prices.update');
     Route::resource('meals', 'MealsController')
         ->only(['edit']);
     Route::resource('meals.ingredients', 'IngredientsController')

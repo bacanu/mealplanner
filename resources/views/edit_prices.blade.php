@@ -1,7 +1,7 @@
 @extends('layouts.default')
 
 @section('content')
-    
+
 <div class="container" id="app">
     <div class="col-sm-12 visible-sm visible-xs">
         <br>
@@ -11,7 +11,7 @@
     </div>
     <div class="col-sm-10">
         <h3>Prices for ingredients</h3>
-        <form method="POST" action="{{ route('prices.store') }}">
+        <form method="POST" action="{{ route('prices.update') }}">
             {!! method_field('PUT') !!}
             {!! csrf_field() !!}
             <h4>Ingredients</h4>
