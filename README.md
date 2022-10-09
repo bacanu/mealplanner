@@ -15,12 +15,37 @@ docker run --rm \
     composer install --ignore-platform-reqs
 ```
 
+### To start docker-compose
+
 `export APP_PORT=8081 && vendor/bin/sail up`
 
 
 ### To enter the container:
 
 `docker-compose exec -- laravel.test bash`
+
+### To create a new laravel app
+
+```
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v $(pwd):/var/www/html \
+    -w /var/www/html \
+    laravelsail/php81-composer:latest \
+    composer create-project laravel/laravel {name of app}
+```
+
+### To install create the docker-compose.yml
+
+```
+docker run --rm -it \
+    -u "$(id -u):$(id -g)" \
+    -v $(pwd):/var/www/html \
+    -w /var/www/html \
+    laravelsail/php81-composer:latest \
+    php artisan sail:install
+```
+
 
 
 ## How to use
