@@ -35,7 +35,7 @@ docker run --rm \
     composer create-project laravel/laravel {name of app}
 ```
 
-### To install create the docker-compose.yml
+### To install / create the docker-compose.yml
 
 ```
 docker run --rm -it \
